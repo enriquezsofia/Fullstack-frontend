@@ -2,7 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "../blog.css";
 
-const Post = ({ post, onEdit, postId }) => {
+const Post = ({ post, postId, onDelete }) => {
   return (
     <div className="blog-post">
       <div className="blog-post-image">
@@ -14,11 +14,14 @@ const Post = ({ post, onEdit, postId }) => {
         <p>{post.body}</p>
         <Link to={`post/${postId}`}>READ MORE</Link>
       </div>
-      <button
-        className="blog-post-edit"
-        onClick={() => onEdit()}
-      >
+      <Link className="blog-post-edit" to={`create-post/${postId}`}>
         Edit
+      </Link>
+      <button
+        onClick={() => onDelete(postId)}
+        className="blog-post-delete"
+      >
+        X
       </button>
     </div>
   );

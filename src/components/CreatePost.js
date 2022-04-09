@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../forms.css";
 
@@ -10,14 +10,16 @@ const CreatePost = ({ onSave, post }) => {
     updatedAt: new Date().toISOString(),
     author: "",
   };
-  const [newPost, setNewPost] = useState(post || defaultNewPost);
+
+  const [newPost, setNewPost] = useState(defaultNewPost);
+
+  useEffect(() => {
+    if (post) setNewPost(post);
+  }, [post]);
 
   const handleOnChange = (event) => {
     const name = event.target.name;
-    const value =
-      name === "imageUrl"
-        ? URL.createObjectURL(event.target.files[0])
-        : event.target.value;
+    const value = event.target.value;
 
     setNewPost({ ...newPost, [name]: value });
   };
@@ -46,23 +48,31 @@ const CreatePost = ({ onSave, post }) => {
             onChange={handleOnChange}
           />
         </div>
+
         <div className="input-field">
           <label>Add an image</label>
-          {newPost.imageUrl !== "" ? (
+          <input
+            type="text"
+            name="imageUrl"
+            placeholder="Add an image url"
+            value={newPost.imageUrl}
+            onChange={handleOnChange}
+          />
+          {newPost.imageUrl !== "" && (
             <img
-              src={newPost.imageUrl}
-              alt="img"
               style={{
+                marginTop: "40px",
                 maxHeight: "200px",
                 maxWidth: "400px",
                 alignSelf: "center",
                 borderRadius: "8px",
               }}
+              src={newPost.imageUrl}
+              alt="img"
             />
-          ) : (
-            <input type="file" name="imageUrl" onChange={handleOnChange} />
           )}
         </div>
+
         <div className="input-field">
           <label>Author</label>
           <input
@@ -73,14 +83,16 @@ const CreatePost = ({ onSave, post }) => {
             onChange={handleOnChange}
           />
         </div>
+
         <div className="buttons-container">
-          <Link to="/">
-            Cancel
-          </Link>
+          <Link to="/">Cancel</Link>
           <button
             type="button"
-            disabled={newPost.title === "" || newPost.body === "" || newPost.author === ""}
-            onClick={() => onSave(newPost)}
+            disabled={newPost.title === "" || newPost.body === ""}
+            onClick={() => {
+              if (post?._id) onSave(post._id, newPost);
+              else onSave(newPost);
+            }}
           >
             Save post
           </button>

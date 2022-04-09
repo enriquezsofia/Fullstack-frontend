@@ -1,19 +1,18 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
 
-import NavBar from "./components/NavBar";
-import HomePage from "./pages/HomePage";
 import ContactUsPage from "./pages/ContactUsPage";
 import CreatePostPage from "./pages/CreatePostPage";
 import DetailPostPage from "./pages/DetailPostPage";
+import HomePage from "./pages/HomePage";
 import JoinOurTeamPage from "./pages/JoinOurTeamPage";
+import NavBar from "./components/NavBar";
 import NotFoundPage from "./pages/NotFoundPage";
 
-import { getPosts, savePost, getPost } from "./api/postsApi";
+import { getPosts, savePost, updatePost, deletePost } from "./api/postsApi";
 
 function App() {
   const [allPosts, setAllPosts] = useState([]);
-  const [postId, setPostId] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,13 +27,26 @@ function App() {
   const handleOnSave = async (post) => {
     const savedPost = await savePost(post);
     if (savedPost) setAllPosts([...allPosts, savedPost]);
-
     navigate("/", { replace: true });
   };
 
-  const handleOnEdit = (postId) => {
-    //setIsCreateVisible(true);
-    setPostId(postId);
+  const handleOnEdit = async (postId, post) => {
+    const editedPost = await updatePost(postId, post);
+    if (editedPost) {
+      const copyOfPosts = Array.from(allPosts);
+      const result = copyOfPosts.filter((post) => post._id !== postId);
+      setAllPosts([...result, editedPost]);
+    }
+    navigate("/", { replace: true });
+  };
+
+  const handleOnDelete = async (id) => {
+    const isDeleted = await deletePost(id);
+    if (isDeleted) {
+      const copyOfPosts = Array.from(allPosts);
+      const result = copyOfPosts.filter((post) => post._id !== id);
+      setAllPosts(result);
+    }
   };
 
   return (
@@ -43,7 +55,7 @@ function App() {
       <Routes>
         <Route
           index
-          element={<HomePage allPosts={allPosts} handleOnEdit={handleOnEdit} />}
+          element={<HomePage allPosts={allPosts} onDelete={handleOnDelete} />}
         />
         <Route path="contact-us" element={<ContactUsPage />} />
         <Route path="join-our-team" element={<JoinOurTeamPage />} />
@@ -53,9 +65,9 @@ function App() {
         />
         <Route
           path="create-post/:postId"
-          element={<CreatePostPage onSave={handleOnSave} />}
+          element={<CreatePostPage onSave={handleOnEdit} />}
         />
-        <Route path="post/:postId" element={<DetailPostPage />} onEdit={handleOnEdit}/>
+        <Route path="post/:postId" element={<DetailPostPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
       <div>Footer</div>

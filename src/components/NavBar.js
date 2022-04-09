@@ -8,9 +8,8 @@ const NavBar = () => {
       <div className="blog-post-brand">
         <Link to="/">
           <img
-            src="https://itjuana.com/wp-content/themes/itjuana/assets/images/svg-grid/itijuana-logo-color.svg"
+            src="https://itjuana.com/wp-content/uploads/ITJ_tm-logo.png"
             alt=""
-            width="100"
             height="50"
           ></img>
         </Link>
